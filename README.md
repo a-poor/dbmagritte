@@ -9,10 +9,11 @@ A database migration tool written in Go.
 Commands:
 * `init`: Set up the repo by creating a `.dbmagritte.yaml` file and a `migrations/` directory.
 * `new`: Create a new migration.
-* `status`: Get the current state of the DB.
+* `info`: Get the current state of the DB.
+* `validate`: Check if the DB is in a valid state? Optional `validate.sql` file?
+
 * `up`: Move forward in the migration tree.
 * `down`: Move back in the migration tree.
-* `validate`: Check if the DB is in a valid state? Optional `validate.sql` file?
 * `reset`: Roll-back all migrations
 * `fast-forward`: Move to the newest migration (assuming there's just one)
 
