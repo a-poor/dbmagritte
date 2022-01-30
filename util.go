@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"os"
+	"path"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -17,22 +18,23 @@ func shortHash(hash plumbing.Hash) string {
 	return hash.String()[:7]
 }
 
-// isAtGitRoot returns true if the current directory is the
+// isAtGitRoot returns true if `dirPath` is the
 // root of a git repository.
-func isAtGitRoot() bool {
-	_, err := os.Stat(".git")
+func isAtGitRoot(dirPath string) bool {
+	p := path.Join(dirPath, ".git")
+	_, err := os.Stat(p)
 	return err == nil
 }
 
 // getGitHash returns the current git hash.
-// If the current directory is not the root of a git repository,
+// If `dirPath` is not the root of a git repository,
 // ErrNotAtGitRoot is returned.
-func getGitHash() (string, error) {
-	if !isAtGitRoot() {
+func getGitHash(dirPath string) (string, error) {
+	if !isAtGitRoot(dirPath) {
 		return "", ErrNotAtGitRoot
 	}
 
-	repo, err := git.PlainOpen(".")
+	repo, err := git.PlainOpen(dirPath)
 	if err != nil {
 		return "", err
 	}

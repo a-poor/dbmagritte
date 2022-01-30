@@ -3,9 +3,9 @@ module github.com/a-poor/dbmagritte
 go 1.17
 
 require (
-	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/urfave/cli/v2 v2.3.0
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 require (

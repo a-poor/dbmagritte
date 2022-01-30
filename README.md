@@ -25,3 +25,4 @@ The directory needs to have an `up.sql` (to make a migration) and a `down.sql` (
 
 **Q:** Should there be a config file in each directory? That way there can be multiple `up`/`down`/`validate` SQL files per migration. They will be run in order. Might solve issues of validating with multiple SQL statements in one file?
 
+Create global flags to set the path to the project root, so it can be run from somewhere else.
