@@ -4,6 +4,13 @@ _created by Austin Poor_
 
 A database migration tool written in Go.
 
+## Motivation
+
+I created this project as a bit of a playground so I could get a sense of the chalanges involved in creating a DB migration tool. I don't plan to maintain or even necessarily finish this tool. 
+
+Any suggestions and comments are welcome!
+
+
 ## Usage
 
 Commands:
@@ -16,6 +23,7 @@ Commands:
 * `down`: Move back in the migration tree.
 * `reset`: Roll-back all migrations
 * `fast-forward`: Move to the newest migration (assuming there's just one)
+
 
 ## Notes
 
