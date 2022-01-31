@@ -53,10 +53,56 @@ func main() {
 						)
 					}
 
-					// Create the config file.
+					// Create the default project config
 					conf := newGlobalConfig()
+
+					// Create the path to the project config file.
 					cf := path.Join(p, defaultGlobalConfigPath)
-					err := conf.write(cf)
+
+					// Create the migrations directory path
+					md := path.Join(p, defaultMigrationsDir)
+
+					// Does the config file already exist?
+					state, err := whatsThatPath(cf)
+					if err != nil {
+						return cli.Exit(
+							fmt.Sprintf("Error creating project config at: %s", err),
+							1,
+						)
+					}
+					if state != PathDoesNotExist {
+						return cli.Exit(
+							fmt.Sprintf(
+								"Can't create project config file. Something already exists at: %s",
+								cf,
+							),
+							1,
+						)
+					}
+
+					// Does the migrations dir already exist?
+					state, err = whatsThatPath(md)
+					if err != nil {
+						return cli.Exit(
+							fmt.Sprintf("Error creating migrations directory at: %s", md),
+							1,
+						)
+					}
+					if state != PathDoesNotExist {
+						return cli.Exit(
+							fmt.Sprintf(
+								"Can't create project config file. Something already exists at: %s",
+								md,
+							),
+							1,
+						)
+					}
+
+					// Update the config info.
+					conf.MigrationDir = defaultMigrationsDir
+
+					// Create the config file
+					err = conf.write(cf)
 					if err != nil {
 						log.Printf("Error writing config file: %q\n", err)
 						return cli.Exit(
@@ -64,10 +110,9 @@ func main() {
 							1,
 						)
 					}
-					fmt.Printf("Wrote config file to: %s\n", cf)
+					fmt.Printf("Wrote config file: %s\n", cf)
 
-					// Create the migrations directory.
-					md := path.Join(p, "migrations")
+					// Create the migrations directory
 					err = os.MkdirAll(md, 0755)
 					if err != nil {
 						log.Printf("Failed to create migrations directory: %q\n", err)
@@ -76,7 +121,7 @@ func main() {
 							1,
 						)
 					}
-					fmt.Printf("Created the migrations directory: %s\n", md)
+					fmt.Printf("Created the migrations directory: %s/\n", md)
 
 					return nil
 				},
@@ -108,30 +153,25 @@ func main() {
 						)
 					}
 
-					// Check if this migration already exists
-					md := path.Join(p, "migrations", hash)
-					err = os.Mkdir(md, 0755)
+					// Get the config file
+					cf := path.Join(p, defaultGlobalConfigPath)
+					gconf, err := readGlobalConfig(cf)
 					if err != nil {
+						log.Println("Error:", err)
 						return cli.Exit(
-							"Failed to create migration directory.",
+							"Failed to read the project config.",
 							1,
 						)
 					}
-					fmt.Printf("Created the migration directory: %s\n", md)
 
-					// Create the migration files
-					mup := path.Join(md, "up.sql")
-					os.OpenFile(
-						mup,
-						os.O_RDONLY|os.O_CREATE,
-						0666,
-					)
-					mdown := path.Join(md, "down.sql")
-					os.OpenFile(
-						mdown,
-						os.O_RDONLY|os.O_CREATE,
-						0666,
-					)
+					_, err = gconf.createNewMigration(hash)
+					if err != nil {
+						log.Println("Error:", err)
+						return cli.Exit(
+							"Failed to create a new migration.",
+							1,
+						)
+					}
 
 					return nil
 				},
@@ -209,7 +249,7 @@ func main() {
 		},
 		// Action: func(c *cli.Context) error {
 		// 	h, err := getGitHash()
-		// 	if err == ErrNotAtGitRoot {
+		// 	if err == ErrNotAtProjRoot {
 		// 		return cli.Exit("No git repository found at current directory.", 1)
 		// 	}
 		// 	if err != nil {
